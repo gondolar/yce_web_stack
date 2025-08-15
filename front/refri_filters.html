@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Refrigerator Search</title>
+	<script src="refri_filters.js" ></script>
+	<link rel="stylesheet" href="default.css" ></link>
+</head>
+<body>
+	<h1>Refrigerator Search</h1>
+	<style	>
+		td.filter_field { width: 5%; text-wrap-mode: nowrap; padding: 0px; }
+		td { border-style: none; }
+		label { display: block; }
+	</style>
+	<table>
+		<tr><td class="filter_field"><label>Name: 		                </label></td><td><input onchange="refri_filters()" id="keyword" type="text" /></td></tr>
+		<tr><td class="filter_field"><label>Minimum temperature:	        </label></td><td><input onchange="refri_filters()" id="minTemp" value=-50 min=-50 max=50 type="number" /></td></tr>
+		<tr><td class="filter_field"><label>Maximum temperature:	        </label></td><td><input onchange="refri_filters()" id="maxTemp" value=50 min=-50 max=50 type="number" /></td></tr>
+		<tr><td class="filter_field"><label>Minimum peak temperature:	    </label></td><td><input onchange="refri_filters()" id="minPeak" value=-50 min=-50 max=50 type="number" /></td></tr>
+		<tr><td class="filter_field"><label>Maximum peak temperature:	    </label></td><td><input onchange="refri_filters()" id="maxPeak" value=50 min=-50 max=50 type="number" /></td></tr>
+		<tr><td class="filter_field"><label>Minimum average temperature:	</label></td><td><input onchange="refri_filters()" id="minAverage" value=-50 min=-50 max=50 type="number" /></td></tr>
+		<tr><td class="filter_field"><label>Maximum average temperature:	</label></td><td><input onchange="refri_filters()" id="maxAverage" value=50 min=-50 max=50 type="number" /></td></tr>
+	</table>
+	<button onclick="refri_filters()">Search</button>
+	<p>Search results:</p>
+	<table>
+		<thead>
+			<th>Refri name          </th>
+			<th>Temperature	        </th>
+			<th>Peak temperature	</th>
+			<th>Average temperature </th>
+		</thead>
+		<tbody id="refri_list"></tbody>
+	</table>
+
+	<script>refri_filters()</script>
+</body>
+
+
+</html>
