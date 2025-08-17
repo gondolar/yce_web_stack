@@ -13,7 +13,7 @@
 		label { display: block; }
 	</style>
 	<table>
-		<tr><td class="filter_field"><label>Name: 		                </label></td><td><input onchange="refri_filters()" id="keyword" type="text" /></td></tr>
+		<tr><td class="filter_field"><label>Name: 							</label></td><td><input onchange="refri_filters()" id="keyword" type="text" /></td></tr>
 		<tr><td class="filter_field"><label>Minimum temperature:	        </label></td><td><input onchange="refri_filters()" id="minTemp" value=-50 min=-50 max=50 type="number" /></td></tr>
 		<tr><td class="filter_field"><label>Maximum temperature:	        </label></td><td><input onchange="refri_filters()" id="maxTemp" value=50 min=-50 max=50 type="number" /></td></tr>
 		<tr><td class="filter_field"><label>Minimum peak temperature:	    </label></td><td><input onchange="refri_filters()" id="minPeak" value=-50 min=-50 max=50 type="number" /></td></tr>
@@ -25,8 +25,10 @@
 	<p>Search results:</p>
 	<table>
 		<thead>
-			<th>Refri name          </th>
+			<th>Sensor	ID			</th>
+			<th>Name				</th>
 			<th>Temperature	        </th>
+			<th>History				</th>
 			<th>Peak temperature	</th>
 			<th>Average temperature </th>
 		</thead>

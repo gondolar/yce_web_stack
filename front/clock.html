@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>NIO Clock</title>
+        <link rel="stylesheet" href="defaults.css" />
+        <link rel="stylesheet" href="clock.css" />
+        <script type="application/javascript" src="clock.js"></script>
+        <script type="application/javascript" src="/api/unix_time"></script>
+    </head>
+    <body>
+        <table>
+            <tr><td></td><td id="nio_calendar"></td><td></td></tr>
+            <tr><td></td><td id="nio_clock"></td><td></td></tr>
+            <tr><td></td><td style="height: 100%;" id="nio_uptime"></td><td></td></tr>
+        </table>
+    </body>
+    <script type="application/javascript">
+        let         NIO_UNIX_TIME_MS    = NIO_UNIX_TIME * 1000;
+        setInterval(updateClocks, 1000);
+        updateClocks();  // Initial call to set the clock
+    </script>
+</html>

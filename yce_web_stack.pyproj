@@ -23,6 +23,35 @@
   <ItemGroup>
     <Compile Include="flask_app.py" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="front\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="front\box.js" />
+    <Content Include="front\clock.css" />
+    <Content Include="front\clock.html" />
+    <Content Include="front\clock.js" />
+    <Content Include="front\core.js" />
+    <Content Include="front\corp.html" />
+    <Content Include="front\corp.js" />
+    <Content Include="front\default.css" />
+    <Content Include="front\defaults.css" />
+    <Content Include="front\geometry.js" />
+    <Content Include="front\gl-matrix-min.js" />
+    <Content Include="front\index.html" />
+    <Content Include="front\nio.html" />
+    <Content Include="front\nio.js" />
+    <Content Include="front\refri_filters.html" />
+    <Content Include="front\refri_filters.js" />
+    <Content Include="front\settings.js" />
+    <Content Include="front\yce_small_sq.png" />
+    <Content Include="front\yce_small_sq_0.png" />
+    <Content Include="front\yce_small_sq_1.png" />
+    <Content Include="front\yce_small_sq_2.png" />
+    <Content Include="front\yce_small_sq_3.png" />
+    <Content Include="front\yce_small_sq_4.png" />
+    <Content Include="front\yce_small_sq_5.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
        Visual Studio and specify your pre- and post-build commands in
