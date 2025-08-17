@@ -6,33 +6,37 @@ attribute vec3 aNormal;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
-uniform mat3 uNormalMatrix;   // optional if you want proper lighting
+uniform mat3 uNormalMatrix;   
+uniform float uTimeTotal;   
 
 varying highp vec2 vTextureCoord;
 varying highp vec3 vNormal;
+varying highp float vTimeTotal;
 
-void main(void) {
-    gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
-    vTextureCoord = aTextureCoord;
-    vNormal = mat3(uNormalMatrix) * aNormal;  // if you set uNormalMatrix, else just vNormal = aNormal;
+void main() {
+    gl_Position     = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
+    vTextureCoord   = aTextureCoord;
+    vNormal         = mat3(uNormalMatrix) * aNormal;  // if you set uNormalMatrix, else just vNormal = aNormal;
+    vTimeTotal      = uTimeTotal;
 }
 `;
 
 const fsSource = `
 precision mediump float;
 
+uniform sampler2D uSampler;
+
 varying highp vec2 vTextureCoord;
 varying highp vec3 vNormal;
-uniform sampler2D uSampler;
+varying highp float vTimeTotal;   // 
+
 //void main() { gl_FragColor = texture2D(uSampler, vTextureCoord); }
-
-void main(void) {
-    vec3 normal   = normalize(vNormal);
-    vec3 lightDir = normalize(vec3(0.5, 0.7, 1.0));
-    float diffuse = max(dot(normal, lightDir), 0.0);
-
-    vec4 texColor = texture2D(uSampler, vTextureCoord);
-    gl_FragColor     = vec4(texColor.rgb * (0.3 + 0.7 * diffuse), texColor.a);
+void main() {
+    vec3    normal   = normalize(vNormal);
+    vec3    lightDir = normalize(vec3(0.5, 0.7, sin(vTimeTotal * 2.0)));
+    float   diffuse  = max(dot(normal, lightDir), 0.0);
+    vec4    texColor = texture2D(uSampler, vTextureCoord);
+    gl_FragColor = vec4(texColor.rgb * (0.15 + 0.85 * diffuse), texColor.a);
 }
 `;
 
@@ -129,7 +133,48 @@ function checkCanvasSize(canvas_node) {
     previousSize.width = clientWidth;
     previousSize.height = clientHeight;
 }
-
+function initShaderProgram(gl, vsSource, fsSource) {
+    const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    const shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+        console.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+        return null;
+    }
+    return shaderProgram;
+}
+function loadShader(gl, type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if(gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+        return shader; 
+    console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+}
+// Usage example
+//const canvas = document.querySelector("#glcanvas");
+//const gl = canvas.getContext("webgl");
+//checkCanvasSize(canvas);
+//const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+//const programInfo = {
+//    program: shaderProgram,
+//    attribLocations: {
+//        vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+//        textureCoord: gl.getAttribLocation(shaderProgram, 'aTextureCoord'),
+//        normal: gl.getAttribLocation(shaderProgram, 'aNormal'),
+//    },
+//    uniformLocations: {
+//        projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+//        modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+//        normalMatrix: gl.getUniformLocation(shaderProgram, 'uNormalMatrix'),
+//        uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
+//    },
+//};
 // Main render loop
 let totalTime   = 0;
 let then        = 0;
@@ -154,19 +199,17 @@ function handleWithWebGL(gl, canvas_node) {
     const { vertexBuffer, indexBuffer, stride } = buildVoxelBuffers(gl);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-
-    const positionAttributeLocation = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-    gl.enableVertexAttribArray(positionAttributeLocation);
-    gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, stride, 0);
-
-    const textureCoordAttributeLocation = gl.getAttribLocation(shaderProgram, "aTextureCoord");
-    gl.enableVertexAttribArray(textureCoordAttributeLocation);
-    gl.vertexAttribPointer(textureCoordAttributeLocation, 2, gl.FLOAT, false, stride, 12);
-
-    const nLoc = gl.getAttribLocation(shaderProgram, "aNormal"); // if your shader uses normals
-    gl.enableVertexAttribArray(nLoc);
-    gl.vertexAttribPointer(nLoc, 3, gl.FLOAT, false, stride, 20);
-
+    {
+        const positionAttributeLocation = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+        gl.enableVertexAttribArray(positionAttributeLocation);
+        gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, stride, 0);
+        const textureCoordAttributeLocation = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+        gl.enableVertexAttribArray(textureCoordAttributeLocation);
+        gl.vertexAttribPointer(textureCoordAttributeLocation, 2, gl.FLOAT, false, stride, 12);
+        const nLoc = gl.getAttribLocation(shaderProgram, "aNormal"); // if your shader uses normals
+        gl.enableVertexAttribArray(nLoc);
+        gl.vertexAttribPointer(nLoc, 3, gl.FLOAT, false, stride, 20);
+    }
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 
     const   uSampler    = gl.getUniformLocation(shaderProgram, 'uSampler');
@@ -195,12 +238,13 @@ function handleWithWebGL(gl, canvas_node) {
     const uModelViewMatrix  = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     const uProjectionMatrix = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     const uNormalMatrix = gl.getUniformLocation(shaderProgram, 'uNormalMatrix');
+	const uTimeTotal = gl.getUniformLocation(shaderProgram, 'uTimeTotal');
 
     const modelMatrix = mat4.create();
     const viewMatrix = mat4.create();
     const modelViewMatrix = mat4.create();
     const normalMatrix = mat3.create();
-    
+
     checkCanvasSize(canvas_node);
 
     gl.enable(gl.DEPTH_TEST);
@@ -222,22 +266,18 @@ function handleWithWebGL(gl, canvas_node) {
 
         mat4.identity(modelMatrix);
         // build model transforms here if needed
-        
         mat4.identity(viewMatrix);
         mat4.translate(viewMatrix, viewMatrix, [0.0, 0.0, -3.0]);
-        mat4.rotate(viewMatrix, viewMatrix, angle, [1.0, 1.0, 1.0]);
-        
+        mat4.rotate(viewMatrix, viewMatrix, angle, [-1.0, 1.0, -1.0]);
         mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
-        
         mat3.normalFromMat4(normalMatrix, modelViewMatrix);
 
-        
         gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
         gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
         gl.uniformMatrix3fv(uNormalMatrix, false, normalMatrix);
+		gl.uniform1f(uTimeTotal, totalTime); // Pass total time to shader if needed
 
         for (let face = 0; face < 6; ++face) {
-
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, textures[face]);
             gl.uniform1i(uSampler, 0);
@@ -249,7 +289,6 @@ function handleWithWebGL(gl, canvas_node) {
     requestAnimationFrame(render);
     return 1;
 }
-
 function initLogo() {
     const canvas_element_id = 'webgl-canvas';
     const canvas_node   = document.getElementById(canvas_element_id);
