@@ -30,20 +30,14 @@ def request_info(full_path="", body=""):
 
 def try_serve_static(full_path, add_slash_redirect=False):
     file_path = os.path.join(STATIC_DIR, full_path);
-    if os.path.isfile(file_path):
+    if os.path.isfile(file_path):    # Serve file directly
         return send_from_directory(STATIC_DIR, full_path);
-
     if add_slash_redirect and os.path.isdir(file_path):    # Redirect to slash if it's a directory without slash
         return redirect(f"/{full_path}/", code=301);
-
     if os.path.isdir(file_path):    # Serve index.html in directory
         index_path = os.path.join(file_path, "index.html");
         if os.path.isfile(index_path):
             return send_from_directory(file_path, "index.html");
-
-    if os.path.isfile(file_path):    # Serve file directly
-        return send_from_directory(STATIC_DIR, full_path);
-
     return None;
 
 @app.route("/", methods=["GET"])

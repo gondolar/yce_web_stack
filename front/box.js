@@ -152,6 +152,16 @@ function checkCanvasSize(canvas_node) {
     previousSize.width = clientWidth;
     previousSize.height = clientHeight;
 }
+function loadShader(gl, type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if(gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+        return shader;
+    console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+}
 function initShaderProgram(gl, vsSource, fsSource) {
     const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
     const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
@@ -164,16 +174,6 @@ function initShaderProgram(gl, vsSource, fsSource) {
         return null;
     }
     return shaderProgram;
-}
-function loadShader(gl, type, source) {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if(gl.getShaderParameter(shader, gl.COMPILE_STATUS))
-        return shader;
-    console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
-    gl.deleteShader(shader);
-    return null;
 }
 // Usage example
 //const canvas = document.querySelector("#glcanvas");
@@ -201,33 +201,21 @@ let then        = 0;
 function handleWithWebGL(gl, canvas_node) {
     const textureFilename = 'yce_small_sq_';
 
-    const vertexShader      = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, vsSource3DDefault);
-    gl.compileShader(vertexShader);
-
-    const fragmentShader    = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, fsSource3DDefault);
-    gl.compileShader(fragmentShader);
-
-    const shaderProgram = gl.createProgram();
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
+    const shaderProgram = initShaderProgram(gl, vsSource3DDefault, fsSource3DDefault);
     gl.useProgram(shaderProgram);
 
     const { vertexBuffer, indexBuffer, stride } = buildVoxelBuffers(gl);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    {
+	{ // configure vertex attributes
         const positionAttributeLocation = gl.getAttribLocation(shaderProgram, "aVertexPosition");
         gl.enableVertexAttribArray(positionAttributeLocation);
         gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, stride, 0);
         const textureCoordAttributeLocation = gl.getAttribLocation(shaderProgram, "aTextureCoord");
         gl.enableVertexAttribArray(textureCoordAttributeLocation);
         gl.vertexAttribPointer(textureCoordAttributeLocation, 2, gl.FLOAT, false, stride, 12);
-        const nLoc = gl.getAttribLocation(shaderProgram, "aNormal"); // if your shader uses normals
-        gl.enableVertexAttribArray(nLoc);
-        gl.vertexAttribPointer(nLoc, 3, gl.FLOAT, false, stride, 20);
+        const normalAttributeLocation = gl.getAttribLocation(shaderProgram, "aNormal"); // if your shader uses normals
+        gl.enableVertexAttribArray(normalAttributeLocation);
+        gl.vertexAttribPointer(normalAttributeLocation, 3, gl.FLOAT, false, stride, 20);
     }
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 
@@ -235,10 +223,8 @@ function handleWithWebGL(gl, canvas_node) {
     let     jsImages    = [null, null, null, null, null, null];
     for (let iFace = 0; iFace < 6; ++iFace) {
         jsImages[iFace] = new Image();
-        //jsImages[iFace].crossOrigin = 'anonymous'; // Uncomment if you need cross-origin support
-        jsImages[iFace].src = textureFilename + iFace.toString() + '.png';
+        jsImages[iFace].src = textureFilename + iFace.toString() + '.png';  //jsImages[iFace].crossOrigin = 'anonymous'; // Uncomment if you need cross-origin support
 	}
-
     // After loading each jsImages[i], create textures:
     let textures = [];
     for (let iFace = 0; iFace < 6; iFace++) {
@@ -253,7 +239,6 @@ function handleWithWebGL(gl, canvas_node) {
         };
         textures.push(tex);
     }
-
     const uModelViewMatrix  = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
     const uProjectionMatrix = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
     const uNormalMatrix = gl.getUniformLocation(shaderProgram, 'uNormalMatrix');
