@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Refrigerator Monitor</title>
+	<script src="refri_filters.js" ></script>
+	<link rel="stylesheet" href="default.css" ></link>
+</head>
+<body>
+	<h1>Refrigerator Monitoring Overview</h1>
+	<style>
+		td.filter_field { width: 5%; text-wrap-mode: nowrap; padding: 0px; }
+		td { border-style: none; }
+		label { display: block; }
+	</style>
+	<table>
+		<thead>
+			<th>Address				</th>
+			<th>Name 				</th>
+			<th>Alert recipients	</th>
+			<th>Nodes				</th>
+			<th>Sensors				</th>
+		</thead>
+		<tbody id="list_stores"></tbody>
+	</table>
+	<table>
+		<thead>
+			<th>ID					</th>
+			<th>Name				</th>
+			<th>Sensors				</th>
+			<th>Battery				</th>
+		</thead>
+		<tbody id="list_relays"></tbody>
+	</table>
+	<table>
+		<thead>
+			<th>ID					</th>
+			<th>Name				</th>
+			<th>Temperature	        </th>
+			<th>History				</th>
+		</thead>
+		<tbody id="list_refris"></tbody>
+	</table>
+	<button onclick="corp_refresh()">Search</button>
+	<script>corp_refresh()</script>
+</body>
+
+
+</html>

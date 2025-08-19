@@ -1,4 +1,4 @@
-const vsSource = `
+const vsSource3DDefault = `
 // Vertex shader
 attribute vec3 aVertexPosition;
 attribute vec2 aTextureCoord;
@@ -6,8 +6,8 @@ attribute vec3 aNormal;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
-uniform mat3 uNormalMatrix;   
-uniform float uTimeTotal;   
+uniform mat3 uNormalMatrix;
+uniform float uTimeTotal;
 
 varying highp vec2 vTextureCoord;
 varying highp vec3 vNormal;
@@ -20,15 +20,14 @@ void main() {
     vTimeTotal      = uTimeTotal;
 }
 `;
-
-const fsSource = `
+const fsSource3DDefault = `
 precision mediump float;
 
 uniform sampler2D uSampler;
 
 varying highp vec2 vTextureCoord;
 varying highp vec3 vNormal;
-varying highp float vTimeTotal;   // 
+varying highp float vTimeTotal;   //
 
 //void main() { gl_FragColor = texture2D(uSampler, vTextureCoord); }
 void main() {
@@ -39,7 +38,35 @@ void main() {
     gl_FragColor = vec4(texColor.rgb * (0.15 + 0.85 * diffuse), texColor.a);
 }
 `;
-
+const SQUARE_MODE = 
+	{ TOP_LEFT: 0
+	, TOP_RIGHT: 1
+	};
+function one_if(condition) { return condition ? 1 : 0; }
+function geometryBuildGridIndices	(vertexOffset, cellCount, counterClockwise, outward) {
+	const	pitch						= cellCount[0] + 1;								// 2 3 
+	const	indices						= counterClockwise ? [1, 0, (pitch + 1), pitch] : [0, 1, pitch, (pitch + 1)];	// 0 1 2 3
+	const	indices_modes				=
+		[ [indices[0], indices[2], indices[3], indices[0], indices[3], indices[1]]
+		, [indices[0], indices[2], indices[1], indices[1], indices[2], indices[3]]
+		];
+	const	halfCount					= [(cellCount[0] >> 1), (cellCount[1] >> 1)];
+	let		vertexIndices				= [];
+	let		index						= 0;
+	for(let offset = [0, 0]; offset[1] < cellCount[1]; ++offset[1]) {
+		for(offset[0] = 0; offset[0] < cellCount[0]; ++offset[0], ++index) {
+			const	reverseQuad 
+				= ( (coord[0] >= halfCount[0] && coord[1] <  halfCount[1])
+				 || (coord[0] <  halfCount[0] && coord[1] >= halfCount[1])
+				);
+			const	relative_indices			= indices_modes[((reverseQuad ? SQUARE_MODE.TOP_RIGHT : SQUARE_MODE.TOP_LEFT) + one_if(outward)) % 2];
+			for(let i = 0; i < 6; ++i) 
+				vertexIndices.push(vertexOffset + vertexIndex + relative_indices[i]);
+		}
+		++vertexIndex; 
+	}
+	return vertexIndices;
+}
 // Flatten VOXEL data into arrays for WebGL
 function buildVoxelBuffers(gl) {
     const VOXEL_FACE_VERTICES =
@@ -77,23 +104,19 @@ function buildVoxelBuffers(gl) {
 
     const vertices = [];
     const indices  = [];
-
     // build interleaved vertex data
     for (let face = 0; face < 6; ++face) {
-        for (let v = 0; v < 4; v++) {
-            const pos = VOXEL_FACE_VERTICES[face][v];
-            const uv  = VOXEL_FACE_UV[face][v];
-            const nor = VOXEL_FACE_NORMALS[face][v];
+        for (let vertexIndex = 0; vertexIndex < 4; ++vertexIndex) {
+            const pos = VOXEL_FACE_VERTICES[face][vertexIndex];
+            const uv  = VOXEL_FACE_UV[face][vertexIndex];
+            const nor = VOXEL_FACE_NORMALS[face][vertexIndex];
             vertices.push(pos[0] - .5, pos[1] - .5, pos[2] - .5, uv[0] * 1.0, uv[1] * 1.0, nor[0] * 1.0, nor[1] * 1.0, nor[2] * 1.0);
         }
     }
-
-    for (let face = 0; face < 6; ++face) {
+    for (let face = 0; face < 6; ++face)
         indices.push(...VOXEL_FACE_INDICES_16[face]);
-    }
 
     const stride = (3 + 2 + 3) * 4; // 8 floats per vertex
-
     const vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -101,10 +124,8 @@ function buildVoxelBuffers(gl) {
     const indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-
     return { vertexBuffer, indexBuffer, stride };
 }
-
 // 'textureLocation' is your texture uniform location in the shader
 function handleTexture(gl, imageToSet, textureLocation) {
     const texture = gl.createTexture();
@@ -118,9 +139,7 @@ function handleTexture(gl, imageToSet, textureLocation) {
 }
 
 const { mat3, mat4, } = glMatrix;
-
 const projectionMatrix = mat4.create();
-
 let previousSize = {width:1, height:1};
 
 function checkCanvasSize(canvas_node) {
@@ -151,7 +170,7 @@ function loadShader(gl, type, source) {
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     if(gl.getShaderParameter(shader, gl.COMPILE_STATUS))
-        return shader; 
+        return shader;
     console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
@@ -183,11 +202,11 @@ function handleWithWebGL(gl, canvas_node) {
     const textureFilename = 'yce_small_sq_';
 
     const vertexShader      = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, vsSource);
+    gl.shaderSource(vertexShader, vsSource3DDefault);
     gl.compileShader(vertexShader);
 
     const fragmentShader    = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, fsSource);
+    gl.shaderSource(fragmentShader, fsSource3DDefault);
     gl.compileShader(fragmentShader);
 
     const shaderProgram = gl.createProgram();
