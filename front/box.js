@@ -1,5 +1,4 @@
 const vsSource3DDefault = `
-// Vertex shader
 attribute vec3 aVertexPosition;
 attribute vec2 aTextureCoord;
 attribute vec3 aNormal;

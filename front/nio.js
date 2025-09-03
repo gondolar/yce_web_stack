@@ -38,25 +38,16 @@ function buttonHover(buttons, indexHovered) {
         }
     }
 }
-
-function isMobile() {
-    // Get the user agent string.
-    const userAgent = navigator.userAgent;
-
-    // Check for keywords that indicate a mobile device.
-    const isMobileBrowser
-         = -1 !== userAgent.indexOf('Mobile')
-        || -1 !== userAgent.indexOf('Android')
-        || -1 !== userAgent.indexOf('iPhone')
-        || -1 !== userAgent.indexOf('iPad')
-        ;
-    // Check for the `ontouchstart` event.
-    const hasTouchScreen = ('ontouchstart' in window);
-    return isMobileBrowser || hasTouchScreen;
+function adjustForMobile() {
+	//body_table = document.getElementById("body_table");
+	//body_table.style.width = "100%";
 }
-
 function initPage() {
+	let browser_is_mobile = isMobile(); 
     let target_iframe   = "iframe_main";
+    if(browser_is_mobile) 
+		adjustForMobile();
+
     menuItemRows = "";
     //for(let item in settings_buttons) {
     //    let menu_name       = settings_buttons[item];

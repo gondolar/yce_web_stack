@@ -39,7 +39,7 @@
     <Content Include="front\geometry.js" />
     <Content Include="front\gl-matrix-min.js" />
     <Content Include="front\index.html" />
-    <Content Include="front\nio.html" />
+    <Content Include="front\login.html" />
     <Content Include="front\nio.js" />
     <Content Include="front\refri_filters.html" />
     <Content Include="front\refri_filters.js" />

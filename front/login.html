@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>Cold Chain Monitoring System</title>
+        <link rel="stylesheet" href="defaults.css" />
+        <script src="gl-matrix-min.js" ></script>
+        <script src="core.js" ></script>
+        <script src="nio.js" ></script>
+        <script src="box.js" ></script>
+    </head>
+    <body>
+        <table>
+            <tr><td colspan="3"></td></tr>
+            <tr style="height: 100%; vertical-align: top; text-align: center;">
+                <td style="width: 10%;">
+                    <canvas style="width: 100%; aspect-ratio:1/1;" id="webgl-canvas" hidden="true"></canvas>
+                    <img id="no-webgl-canvas" src="yce_small_sq.png" />
+                    <table id="menu_table" style="height:10%;"></table>
+                </td>
+                <td style="text-align: center; border-color: orange;">
+<table style="border-width: 0px; height: auto; width: 100%; text-align: center;">
+  <tr><td></td><td style="text-align: right;">Username:</td><td style="text-align: left;" ><input type="text"      id="input_username" /></td><td></td></tr>
+  <tr><td></td><td style="text-align: right;">Password:</td><td style="text-align: left;" ><input type="password"  id="input_password" /></td><td></td></tr>
+  <tr><td style="width:50%;" ></td><td style="text-align:center;" colspan="2" ><input style="width:100%;" type="submit" value="Log in" /> </td><td style="width:50%;" ></td></tr>
+  <tr><td style="width:50%;" ></td><td style="text-align:center;" colspan="2" ><a href="user_recover">Forgot password? Click here!</a> </td><td style="width:50%;" ></td></tr>
+  <tr><td style="width:50%;" ></td><td style="text-align:center;" colspan="2" ><a href="user_register">New user? Register!</a> </td><td style="width:50%;" ></td></tr>
+</table>
+                </td>
+                <td style="width: 10%;"></td>
+            </tr>
+            <!--tr><td></td><td></td><td></td></tr-->
+        </table>
+        <footer>
+            <script type="application/javascript" >initPage();</script>
+            <script type="application/javascript" >initLogo();</script>
+            <script type="application/javascript" >
+                const       RELOAD_SECONDS      = 60;
+                setInterval(() => reloadInlineFrame('iframe_clock'), RELOAD_SECONDS * 1000);
+                setInterval(() => reloadStatus('ssid_select'), RELOAD_SECONDS * 1000);
+            </script>
+        </footer>
+    </body>
+</html>
