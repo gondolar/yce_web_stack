@@ -50,10 +50,17 @@ def catch_all(full_path):
     path_levels = full_path.split('/');
     first_folder = path_levels[0];
     if 1 == len(first_folder):
-        static_resp = try_serve_static(full_path);
-        if static_resp:
-            return static_resp;
-        return Response(request_info(full_path), status=404, mimetype="application/json");
+        if(first_folder == "login"):
+            full_path += ".html";
+            static_resp = try_serve_static(full_path);
+            return static_resp if static_resp else Response(request_info(full_path), status=404, mimetype="application/json");
+        elif(first_folder == "user_recover"):
+            return Response(request_info(full_path), status=404, mimetype="application/json");
+        elif(first_folder == "user_register"):
+            return Response(request_info(full_path), status=404, mimetype="application/json");
+        else:
+            static_resp = try_serve_static(full_path);
+            return static_resp if static_resp else Response(request_info(full_path), status=404, mimetype="application/json");
     elif first_folder == "api":
         if request.method == "GET":
             return Response(request_info(full_path), status=200, mimetype="application/json");
@@ -64,12 +71,8 @@ def catch_all(full_path):
             redirect_resp = try_serve_static(full_path, add_slash_redirect=True);
             if redirect_resp:
                 return redirect_resp;
-
         static_resp = try_serve_static(full_path);
-        if static_resp:
-            return static_resp;
-
-        return Response(request_info(full_path), status=404, mimetype="application/json");
+        return static_resp if static_resp else Response(request_info(full_path), status=404, mimetype="application/json");
 
     elif request.method == "POST":
         static_resp = try_serve_static(full_path);

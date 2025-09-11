@@ -15,12 +15,46 @@ let SEngineSceneConstants =
 	, LightPosition				: vec3.create()
 	, PaddingB					: 0
 	};
-function geometryBuildBox		(::gpk::SGeometryBuffers & geometry, const ::gpk::SParamsBox & params) {
-	const	offsetPositions				= geometry.Positions		.size(); geometry.Positions			.resize(offsetPositions			+ 24);
-	const	offsetNormals				= geometry.Normals			.size(); geometry.Normals			.resize(offsetNormals			+ 24);
-	const	offsetTextureCoords			= geometry.TextureCoords	.size(); geometry.TextureCoords		.resize(offsetTextureCoords		+ 24);
-	const	offsetPositionIndices		= geometry.PositionIndices	.size(); geometry.PositionIndices	.resize(offsetPositionIndices	+ 36);
-	const	vertices					= {&::gpk::VOXEL_FACE_VERTICES[0].A, 24};
+
+const VOXEL_FACE_VERTICES =
+    [ [[0, 1, 0], [1, 1, 0], [0, 1, 1], [1, 1, 1]]  // Top
+    , [[1, 0, 0], [1, 1, 0], [1, 0, 1], [1, 1, 1]]  // Front
+    , [[0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1]]  // Right
+    , [[0, 0, 0], [1, 0, 0], [0, 0, 1], [1, 0, 1]]  // Bottom
+    , [[0, 0, 0], [0, 1, 0], [0, 0, 1], [0, 1, 1]]  // Back
+    , [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0]]  // Left
+    ];
+const VOXEL_FACE_UV =
+    [ [[0.0, 0.0], [1.0, 0], [0, 1], [1, 1]]
+    , [[0.0, 0.0], [1.0, 0], [0, 1], [1, 1]]
+    , [[0.0, 0.0], [1.0, 0], [0, 1], [1, 1]]
+    , [[0.0, 0.0], [1.0, 0], [0, 1], [1, 1]]
+    , [[0.0, 0.0], [1.0, 0], [0, 1], [1, 1]]
+    , [[0.0, 0.0], [1.0, 0], [0, 1], [1, 1]]
+    ];
+const VOXEL_FACE_NORMALS =
+    [ [[0.0,  1.0, 0], [0,  1.0, 0], [0,  1, 0], [0,  1, 0]]
+    , [[1.0,  0, 0], [1,  0, 0], [1,  0, 0], [1,  0, 0]]
+    , [[0,  0, 1.0], [0,  0, 1.0], [0,  0, 1], [0,  0, 1]]
+    , [[0, -1.0, 0], [0, -1.0, 0], [0, -1, 0], [0, -1, 0]]
+    , [[-1.0, 0, 0], [-1.0, 0, 0], [-1, 0, 0], [-1, 0, 0]]
+    , [[0,  0,-1.0], [0,  0,-1.0], [0,  0,-1], [0,  0,-1]]
+    ];
+const VOXEL_FACE_INDICES_16 =
+    [ [4*3+0, 4*3+1, 4*3+2, 4*3+1, 4*3+3, 4*3+2] // Bottom
+    , [4*4+0, 4*4+2, 4*4+1, 4*4+1, 4*4+2, 4*4+3] // Back
+    , [4*5+0, 4*5+2, 4*5+1, 4*5+1, 4*5+2, 4*5+3] // Left
+    , [4*0+0, 4*0+2, 4*0+1, 4*0+1, 4*0+2, 4*0+3] // Top
+    , [4*1+0, 4*1+1, 4*1+2, 4*1+1, 4*1+3, 4*1+2] // Front
+    , [4*2+0, 4*2+1, 4*2+2, 4*2+1, 4*2+3, 4*2+2] // Right
+    ];
+
+function geometryBuildBox		(geometry, params) {
+	const	offsetPositions				= geometry.Positions		.length; geometry.Positions			.resize(offsetPositions			+ 24);
+	const	offsetNormals				= geometry.Normals			.length; geometry.Normals			.resize(offsetNormals			+ 24);
+	const	offsetTextureCoords			= geometry.TextureCoords	.length; geometry.TextureCoords		.resize(offsetTextureCoords		+ 24);
+	const	offsetPositionIndices		= geometry.PositionIndices	.length; geometry.PositionIndices	.resize(offsetPositionIndices	+ 36);
+	const	vertices					= [...VOXEL_FACE_VERTICES];
 	for(uint32_t iVertex = offsetPositions; iVertex < geometry.Positions.size(); ++iVertex)
 		geometry.Positions[iVertex]	= params.Orientation.RotateVector(vertices[iVertex].Scaled(params.HalfSizes * 2.0f) - params.Origin);
 
@@ -29,7 +63,7 @@ function geometryBuildBox		(::gpk::SGeometryBuffers & geometry, const ::gpk::SPa
 		geometry.Normals[iVertex]	= params.Orientation.RotateVector(geometry.Normals[iVertex]);
 	memcpy(&geometry.Normals		[offsetNormals		], ::gpk::VOXEL_FACE_NORMALS.begin(), ::gpk::VOXEL_FACE_NORMALS	.byte_count());
 	memcpy(&geometry.TextureCoords	[offsetTextureCoords], ::gpk::VOXEL_FACE_UV.begin()		, ::gpk::VOXEL_FACE_UV		.byte_count());
-	const ::gpk::vcu16			indices						= {::gpk::VOXEL_FACE_INDICES_16[0], 36};
+	const			indices						= {::gpk::VOXEL_FACE_INDICES_16[0], 36};
 	for(uint32_t iIndex = offsetPositionIndices; iIndex < geometry.PositionIndices.size(); ++iIndex) 
 		geometry.PositionIndices[iIndex] = indices[iIndex];
 
