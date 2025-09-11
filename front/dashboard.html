@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Refrigerator Monitor</title>
+	<script src="core.js" ></script>
+	<script src="dashboard.js" ></script>
+	<link rel="stylesheet" href="default.css" />
+	<link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+	<h1>Sensor Monitoring Overview</h1>
+	<style>
+		td.filter_field { width: 5%; text-wrap-mode: nowrap; padding: 0px; }
+		td { border-style: none; }
+		label { display: block; }
+	</style>
+	<table id="assign"></table>
+	<table id="carers"></table>
+	<table id="places"></table>
+	<table id="relays"></table>
+	<table id="senses"></table>
+	<script>
+        let         NIO_UNIX_TIME_MS    = NIO_UNIX_TIME * 1000;
+        setInterval(dashboard_refresh, 1000);
+		dashboard_refresh();
+	</script>
+</body>
+
+
+</html>

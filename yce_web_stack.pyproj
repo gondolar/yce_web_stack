@@ -32,8 +32,8 @@
     <Content Include="front\clock.html" />
     <Content Include="front\clock.js" />
     <Content Include="front\core.js" />
-    <Content Include="front\corp.html" />
-    <Content Include="front\corp.js" />
+    <Content Include="front\dashboard.html" />
+    <Content Include="front\dashboard.js" />
     <Content Include="front\default.css" />
     <Content Include="front\defaults.css" />
     <Content Include="front\geometry.js" />
@@ -42,7 +42,7 @@
     <Content Include="front\login.html" />
     <Content Include="front\nio.js" />
     <Content Include="front\recover.html" />
-    <Content Include="front\refri_filters.html" />
+    <Content Include="front\sensor.html" />
     <Content Include="front\refri_filters.js" />
     <Content Include="front\register.html" />
     <Content Include="front\settings.js" />

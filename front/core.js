@@ -13,8 +13,7 @@ function isMobile() {
     const hasTouchScreen = ('ontouchstart' in window);
     return isMobileBrowser || hasTouchScreen;
 }
-
-function fetchAndGenerateOptions(address, parent) {
+function fetchAndGenerateOptions(address, parent, styleValue="width:50px") {
     fetch("/api/" + address)
         .then(function (response) {
             if (response.ok)
@@ -23,14 +22,12 @@ function fetchAndGenerateOptions(address, parent) {
         })
         .then(function (data) {
             let options = '';
-            for (network of data) {
-                options += `<option style="width:50px;" value="${network.ssid}" >${network.ssid}</option>`;
-            }
+            for (network of data)
+                options += `<option style="${styleValue}" value="${network.ssid}" >${network.ssid}</option>`;
             parent.innerHTML += options;
         })
         .catch(function (error) { console.error('There was a problem with the fetch operation:', error); });
 }
-
 function reloadStatus(tableId) {
     const table = document.getElementById(tableId);
     if (table) {
@@ -44,10 +41,8 @@ function reloadStatus(tableId) {
         }
     }
 }
-
 function reloadInlineFrame(frameId) {
     const iframe = document.getElementById(frameId);
-    if (iframe) {
+    if (iframe)
         iframe.src = iframe.src; // Reloads the iframe by setting its source again
-    }
 }

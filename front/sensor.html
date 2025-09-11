@@ -21,21 +21,14 @@
 		<tr><td class="filter_field"><label>Minimum average temperature:	</label></td><td><input onchange="refri_filters()" id="minAverage" value=-50 min=-50 max=50 type="number" /></td></tr>
 		<tr><td class="filter_field"><label>Maximum average temperature:	</label></td><td><input onchange="refri_filters()" id="maxAverage" value=50 min=-50 max=50 type="number" /></td></tr>
 	</table>
-	<button onclick="refri_filters()">Search</button>
+	<button onclick="sensor_filters()">Search</button>
 	<p>Search results:</p>
-	<table>
-		<thead>
-			<th>Sensor	ID			</th>
-			<th>Name				</th>
-			<th>Temperature	        </th>
-			<th>History				</th>
-			<th>Peak temperature	</th>
-			<th>Average temperature </th>
-		</thead>
-		<tbody id="refri_list"></tbody>
-	</table>
-
-	<script>refri_filters()</script>
+	<table id="assign"></table>
+	<table id="carers"></table>
+	<table id="places"></table>
+	<table id="relays"></table>
+	<table id="senses"></table>
+	<script>sensor_filters()</script>
 </body>
 
 
