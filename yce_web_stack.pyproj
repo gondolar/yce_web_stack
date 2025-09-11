@@ -41,8 +41,10 @@
     <Content Include="front\index.html" />
     <Content Include="front\login.html" />
     <Content Include="front\nio.js" />
+    <Content Include="front\recover.html" />
     <Content Include="front\refri_filters.html" />
     <Content Include="front\refri_filters.js" />
+    <Content Include="front\register.html" />
     <Content Include="front\settings.js" />
     <Content Include="front\yce_small_sq.png" />
     <Content Include="front\yce_small_sq_0.png" />
